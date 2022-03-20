@@ -1,0 +1,9 @@
+{
+  "id": "velocity-global-ping",
+  "name": "VelocityGlobalPing",
+  "version": "@VERSION@",
+  "url": "https://github.com/AzisabaNetwork",
+  "authors": ["Azisaba Network"],
+  "dependencies": [],
+  "main": "net.azisaba.velocityGlobalPing.VelocityGlobalPing"
+}
