@@ -18,6 +18,7 @@ import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class VelocityGlobalPing {
     private final List<String> servers = new ArrayList<>();
@@ -29,12 +30,16 @@ public class VelocityGlobalPing {
         try {
             logger.info("Loading config from " + dataDirectory.resolve("config.yml"));
             //noinspection UnstableApiUsage
-            this.servers.addAll(YAMLConfigurationLoader.builder()
+            List<String> list = YAMLConfigurationLoader.builder()
                     .setPath(dataDirectory.resolve("config.yml"))
                     .build()
                     .load()
                     .getNode("servers")
-                    .getList(TypeToken.of(String.class)));
+                    .getList(TypeToken.of(String.class))
+                    .stream()
+                    .map(String::toLowerCase)
+                    .toList();
+            servers.addAll(list);
             logger.info("Loaded " + servers.size() + " servers");
         } catch (IOException e) {
             logger.warn("Failed to load config", e);
@@ -46,7 +51,7 @@ public class VelocityGlobalPing {
     @Subscribe
     public void onProxyPing(ProxyPingEvent e) {
         e.getConnection().getVirtualHost().map(InetSocketAddress::getHostName).ifPresent(hostName -> {
-            if (servers.contains(hostName)) {
+            if (servers.contains(hostName.toLowerCase(Locale.ROOT))) {
                 ServerPing.Builder builder = e.getPing().asBuilder();
                 this.server.getConfiguration().getFavicon().ifPresent(builder::favicon);
                 builder.clearSamplePlayers();
